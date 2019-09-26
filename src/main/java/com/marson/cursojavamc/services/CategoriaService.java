@@ -4,10 +4,12 @@ package com.marson.cursojavamc.services;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import com.marson.cursojavamc.domain.Categoria;
 import com.marson.cursojavamc.repositories.CategoriaRepository;
+import com.marson.cursojavamc.services.exceptions.DateIntegrityException;
 import com.marson.cursojavamc.services.exceptions.ObjectNotFountException;
 
 @Service
@@ -31,6 +33,16 @@ public class CategoriaService {
 	public Categoria update(Categoria obj) {
 		find(obj.getId());
 		return repo.save(obj);
+	}
+	
+	public void delete(Integer id) {
+		find(id);
+		
+		try {
+			repo.deleteById(id);
+		}catch(DataIntegrityViolationException e) {
+			throw new DateIntegrityException("Não é possível excluir uma categoria que possuiu produtos");
+		}
 	}
 	
 }
